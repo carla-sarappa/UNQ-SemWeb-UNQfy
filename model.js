@@ -8,7 +8,12 @@ class Repository{
     }
 
     filterTracksBy(attr, values){
-       return this.getTracks().filter(track => values.includes(track[attr]) );
+      console.log("<<<<< ", attr);
+      
+       let tracks = this.getTracks().filter(track => values.includes(track[attr]) );
+
+       console.log(">>>> ", tracks);
+       return tracks;
     }
 
     getAlbums(){
