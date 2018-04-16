@@ -14,16 +14,21 @@ class UNQfy {
   }
 
   getTracksMatchingArtist(artistName) {
-    return this.repository.filterTracksBy('artist', artistName);
-  }
+    let artist = this.getArtistByName(artistName);
+    console.log("artist name:", artistName);
+    console.log("getTracksMatchingArtist:  ---", artist);
 
+    return artist.albums.reduce((accumulator, album) => accumulator.concat(album.tracks), []);
+  }
 
   /* Debe soportar al menos:
      params.name (string)
      params.country (string)
   */
   addArtist(params) {
-    // El objeto artista creado debe soportar (al menos) las propiedades name (string) y country (string)
+    // El objeto artista creado debe soportar (al menos)
+    // las propiedades name (string) y country (string)
+    this.repository.addArtist(new model.Artist(params.name, params.country));
   }
 
 
@@ -33,6 +38,8 @@ class UNQfy {
   */
   addAlbum(artistName, params) {
     // El objeto album creado debe tener (al menos) las propiedades name (string) y year
+    let artist = this.getArtistByName(artistName);
+    artist.albums.push(new model.Album(params.name, params.year));
   }
 
 
@@ -47,20 +54,22 @@ class UNQfy {
          duration (number),
          genres (lista de strings)
     */
-    console.log("Hii");
-    this.repository.tracks.push(new model.Track(params.name, params.duration, params.genre));
+    let album = this.getAlbumByName(albumName);
+    album.tracks.push(new model.Track(params.name, params.duration, params.genre));
   }
 
   getArtistByName(name) {
-    
+    let artist = this.repository.artists.find(artist => name == artist.name);
+    console.log(" ---getArtistByName: ", artist);
+    return artist;
   }
 
   getAlbumByName(name) {
-
+    return this.repository.getAlbums().find(album => name === album.name);
   }
 
   getTrackByName(name) {
-
+    return this.repository.getTracks().find(track => name === track.name);
   }
 
   getPlaylistByName(name) {
@@ -93,4 +102,3 @@ class UNQfy {
 module.exports = {
   UNQfy,
 };
-

@@ -5,7 +5,7 @@ const libunqfy = require('./unqfy');
 
 
 function createAndAddArtist(unqfy, artistName, country) {
-  unqfy.addArtist({ name: artistName, country });
+  unqfy.addArtist({ name: artistName, country: country });
   const artist = unqfy.getArtistByName(artistName);
   return artist;
 }
@@ -50,9 +50,8 @@ describe('Add, remove and filter data', () => {
 
     assert.equal(track.name, 'Welcome to the jungle');
     assert.strictEqual(track.duration, 200);
-    assert.equal(track.genres.includes('rock'), true);
-    assert.equal(track.genres.includes('hard rock'), true);
-    assert.lengthOf(track.genres, 2);
+    assert.equal(track.genre, 'rock');
+    assert.equal(track.genre, 'hard rock');
   });
 
   it('should get all tracks matching genres', () => {
@@ -92,7 +91,7 @@ describe('Add, remove and filter data', () => {
     createAndAddTrack(unqfy, 'Thriller', 'Another song', 500, ['classic']);
     createAndAddTrack(unqfy, 'Thriller', 'Another song II', 500, ['movie']);
 
-    const matchingTracks = unqfy.getTracksMatchingArtist(artist);
+    const matchingTracks = unqfy.getTracksMatchingArtist(artist.name);
 
     assert.isArray(matchingTracks);
     assert.lengthOf(matchingTracks, 3);
