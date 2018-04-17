@@ -30,7 +30,7 @@ class Command {
     if (args.length !== this.arity) {
       console.log("Usage:");
       console.log("    ", this.help);
-      console.log("\n\nUse the command 'help' for listing the available commands.")
+      console.log("\n\nUse the command 'help' for listing the available commands.");
     } else {
       try {
         return this.block(args);
