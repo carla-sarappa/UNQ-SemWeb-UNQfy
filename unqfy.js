@@ -27,6 +27,8 @@ class UNQfy {
   addArtist(params) {
     // El objeto artista creado debe soportar (al menos)
     // las propiedades name (string) y country (string)
+    if (params.name === "") throw "El nombre del artista no debe ser vacio";
+
     this.repository.addArtist(new model.Artist(params.name, params.country));
   }
 
@@ -96,6 +98,7 @@ class UNQfy {
     // TODO: Agregar a la lista todas las clases que necesitan ser instanciadas
     const classes = [UNQfy, model.Album, model.Track, model.Artist, model.Repository, model.Playlist];
     fs.registerClasses(...classes);
+    
     return fs.load(filename);
   }
 }
