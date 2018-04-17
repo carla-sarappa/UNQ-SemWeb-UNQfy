@@ -10,15 +10,13 @@ class UNQfy {
    
   getTracksMatchingGenres(genres) {
     // Debe retornar todos los tracks que contengan alguno de los generos en el parametro genres
-    
+
     return this.repository.filterTracksBy('genre', genres);
   }
 
   getTracksMatchingArtist(artistName) {
     let artist = this.getArtistByName(artistName);
-    console.log("artist name:", artistName);
-    console.log("getTracksMatchingArtist:  ---", artist);
-
+   
     return artist.albums.reduce((accumulator, album) => accumulator.concat(album.tracks), []);
   }
 
@@ -61,7 +59,6 @@ class UNQfy {
 
   getArtistByName(name) {
     let artist = this.repository.artists.find(artist => name == artist.name);
-    console.log(" ---getArtistByName: ", artist);
     return artist;
   }
 
@@ -74,7 +71,7 @@ class UNQfy {
   }
 
   getPlaylistByName(name) {
-
+    return this.repository.playlists.find(playlist => name == playlist.name);
   }
 
   addPlaylist(name, genresToInclude, maxDuration) {
@@ -83,9 +80,13 @@ class UNQfy {
       * un metodo duration() que retorne la duración de la playlist.
       * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist
     */
-
+    const playlist = new model.Playlist(name, maxDuration);
+    const tracksDisponibles = this.getTracksMatchingGenres(genresToInclude);
+    playlist.selectAndAddTracks(tracksDisponibles, playlist.maxDuration);
+    this.repository.playlists.push(playlist);
   }
 
+  
   save(filename = 'unqfy.json') {
     new picklejs.FileSerializer().serialize(filename, this);
   }
@@ -93,7 +94,7 @@ class UNQfy {
   static load(filename = 'unqfy.json') {
     const fs = new picklejs.FileSerializer();
     // TODO: Agregar a la lista todas las clases que necesitan ser instanciadas
-    const classes = [UNQfy, model.Album, model.Track, model.Artist, model.Repository];
+    const classes = [UNQfy, model.Album, model.Track, model.Artist, model.Repository, model.Playlist];
     fs.registerClasses(...classes);
     return fs.load(filename);
   }
