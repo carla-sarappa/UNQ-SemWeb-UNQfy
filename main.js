@@ -27,7 +27,7 @@ class Command {
   }
 
   execute(args) {
-    if (args.length !== this.arity) {
+    if (args.length !== this.arity && this.arity >= 0) {
       console.log("Usage:");
       console.log("    ", this.help);
       console.log("\n\nUse the command 'help' for listing the available commands.");
@@ -92,12 +92,12 @@ class CommandFactory {
       return unqfy.getPlaylistByName(args[0]);
     });
 
-    this.create('get-tracks-matching-genres', 20, 'get-tracks-matching-genres <genre1 [, genre2 ...]>', (args) => { 
-      return unqfy.getTracksMatchinGenres(args);
+    this.create('get-tracks-matching-genres', -1, 'get-tracks-matching-genres <genre1 [, genre2 ...]>', (args) => { 
+      return unqfy.getTracksMatchingGenres(args);
     });
 
     this.create('get-tracks-matching-artist', 1, 'get-tracks-matching-artist <artist name>', (args) => { 
-      return unqfy.getTracksMatchinArtist(args[0]);
+      return unqfy.getTracksMatchingArtist(args[0]);
     });
 
     const commandHelp = "Available commands: \n\n" + Object.values(this.commands).map((c)=> '    ' + c.help + '\n').join('');
