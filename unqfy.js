@@ -39,7 +39,8 @@ class UNQfy {
   */
   addAlbum(artistName, params) {
     // El objeto album creado debe tener (al menos) las propiedades name (string) y year
-    let artist = this.getArtistByName(artistName);
+    const artist = this.getArtistByName(artistName);
+    if (! artist) throw "No existe el artista " + artistName;
     artist.albums.push(new model.Album(params.name, params.year));
   }
 
@@ -55,25 +56,35 @@ class UNQfy {
          duration (number),
          genres (lista de strings)
     */
-    let album = this.getAlbumByName(albumName);
+    const album = this.getAlbumByName(albumName);
+    if (!album) throw "No existe el album " + albumName;
+
     album.tracks.push(new model.Track(params.name, params.duration, params.genre));
   }
 
   getArtistByName(name) {
-    let artist = this.repository.artists.find(artist => name == artist.name);
+    const artist = this.repository.artists.find(artist => name == artist.name);
+    if(!artist) throw "No se encontro el artista " + name;
     return artist;
   }
 
   getAlbumByName(name) {
-    return this.repository.getAlbums().find(album => name === album.name);
+    const album = this.repository.getAlbums().find(album => name === album.name);
+    if(!album) throw "No se encontro el album " + name;
+    return album;
   }
 
   getTrackByName(name) {
-    return this.repository.getTracks().find(track => name === track.name);
+    const track = this.repository.getTracks().find(track => name === track.name);
+
+    if(!track) throw "No se encontro el track " + name;
+    return track;
   }
 
   getPlaylistByName(name) {
-    return this.repository.playlists.find(playlist => name == playlist.name);
+    const playlist = this.repository.playlists.find(playlist => name == playlist.name);
+    if(!playlist) throw "No se encontro la playlist " + name;
+    return playlist;
   }
 
   addPlaylist(name, genresToInclude, maxDuration) {

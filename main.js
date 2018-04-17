@@ -30,6 +30,7 @@ class Command {
     if (args.length !== this.arity) {
       console.log("Usage:");
       console.log("    ", this.help);
+      console.log("\n\nUse the command 'help' for listing the available commands.")
     } else {
       try {
         return this.block(args);
@@ -61,6 +62,48 @@ class CommandFactory {
       return unqfy.getArtistByName(args[0]);
     });
 
+    this.create('add-album', 3, 'add-album <artist name> <album name> <album year>', (args) => { 
+      const album = { name: args[1], year: args[2] };
+      unqfy.addAlbum(args[0], album);
+      return "Album added: " + album.name;
+    });
+
+    this.create('get-album', 1, 'get-album <album name>', (args) => { 
+      return unqfy.getAlbumByName(args[0]);
+    });
+
+    this.create('add-track', 4, 'add-track <album name> <track name> <track duration> <track genre>', (args) => { 
+      const track = { name: args[1], duration: args[2], genre: args[3] };
+      unqfy.addTrack(args[0], track);
+      return "Track added: " + track.name;
+    });
+
+    this.create('get-track', 1, 'get-track <track name>', (args) => { 
+      return unqfy.getTrackByName(args[0]);
+    });
+
+    this.create('add-playlist', 3, 'add-playlist <playlist name> <playlist genre> <playlist duration>', (args) => { 
+      const playlist = { name: args[0], genre: args[1], duration: args[2] };
+      unqfy.addPlaylist(playlist);
+      return "Playlist added: " + playlist.name;
+    });
+
+    this.create('get-playlist', 1, 'get-playlist <playlist name>', (args) => { 
+      return unqfy.getPlaylistByName(args[0]);
+    });
+
+    this.create('get-tracks-matching-genres', 20, 'get-tracks-matching-genres <genre1 [, genre2 ...]>', (args) => { 
+      return unqfy.getTracksMatchinGenres(args);
+    });
+
+    this.create('get-tracks-matching-artist', 1, 'get-tracks-matching-artist <artist name>', (args) => { 
+      return unqfy.getTracksMatchinArtist(args[0]);
+    });
+
+    const commandHelp = "Available commands: \n\n" + Object.values(this.commands).map((c)=> '    ' + c.help + '\n').join('');
+
+    this.create('help', 0, commandHelp, (args)=> commandHelp);
+
     return this.commands;
   }
 }
@@ -80,8 +123,9 @@ function main() {
     .loadCommands(unqfy)[action]
     .execute(commandArguments);
 
-  console.log("Result: \n");
-  console.log(result);
+  if (result) {
+    console.log(result);
+  }  
   
   saveUNQfy(unqfy, 'estado');
 }
