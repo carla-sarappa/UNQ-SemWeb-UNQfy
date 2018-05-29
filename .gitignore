@@ -65,3 +65,4 @@ test.json
 .vscode
 spotifyCreds.json
 generateSpotifyCredentials.js
+musixmatchCreds.json

@@ -100,9 +100,19 @@ class CommandFactory {
       return unqfy.getTracksMatchingArtist(args[0]);
     });
 
-    this.create('populate-albums-for-artist', 1, 'populate <artist name>', (args) => { 
+    this.create('populate-albums-for-artist', 1, 'populate-albums-for-artist <artist name>', (args) => { 
       return unqfy.populateAlbumsForArtist(args[0]).then( () => saveUNQfy(unqfy, 'estado'));
     });
+
+    this.create('get-lyrics-for-track', 1, 'get-lyrics-for-track <track name>', (args) => { 
+      unqfy.getLyricsForTrack(args[0])
+        .then( lyrics => console.log(lyrics))
+        .then( () => saveUNQfy(unqfy, 'estado'));
+
+      // Esto es porque necesitamos resolver la promesa antes de imprimir por pantalla  
+      return '';  
+    });
+    
 
     const commandHelp = "Available commands: \n\n" + Object.values(this.commands).map((c)=> '    ' + c.help + '\n').join('');
 

@@ -1,7 +1,10 @@
 
 const picklejs = require('picklejs');
+const Promise = require('bluebird');
+
 const model = require('./model/model');
 const spotify = require('./spotify');
+const musixmatch = require('./musixmatch');
 
 
 class UNQfy {
@@ -59,7 +62,7 @@ class UNQfy {
     */
     const album = this.getAlbumByName(albumName);
     if (!album) throw "No existe el album " + albumName;
-
+    console.log(album);
     album.tracks.push(new model.Track(params.name, params.duration, params.genre));
   }
 
@@ -111,6 +114,21 @@ class UNQfy {
             year: album.release_date 
           }));
       });
+  }
+
+  getLyricsForTrack(trackName){
+    const track = this.getTrackByName(trackName);
+    const musix = new musixmatch.Musixmatch();
+
+    if (!track.lyrics){
+      return musix.getLyricsFromTrackName(trackName)
+        .then(lyrics => {
+          track.lyrics = lyrics;
+          return lyrics;
+        });
+    }
+    
+    return Promise.resolve(track.lyrics);
   }
   
   save(filename = 'unqfy.json') {
