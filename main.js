@@ -100,6 +100,10 @@ class CommandFactory {
       return unqfy.getTracksMatchingArtist(args[0]);
     });
 
+    this.create('populate-albums-for-artist', 1, 'populate <artist name>', (args) => { 
+      return unqfy.populateAlbumsForArtist(args[0]).then( () => saveUNQfy(unqfy, 'estado'));
+    });
+
     const commandHelp = "Available commands: \n\n" + Object.values(this.commands).map((c)=> '    ' + c.help + '\n').join('');
 
     this.create('help', 0, commandHelp, (args)=> commandHelp);

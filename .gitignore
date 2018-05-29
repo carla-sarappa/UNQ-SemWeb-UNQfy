@@ -63,3 +63,5 @@ typings/
 estado
 test.json
 .vscode
+spotifyCreds.json
+generateSpotifyCredentials.js

@@ -1,6 +1,7 @@
 
 const picklejs = require('picklejs');
-const model = require('./model');
+const model = require('./model/model');
+const spotify = require('./spotify');
 
 
 class UNQfy {
@@ -99,6 +100,18 @@ class UNQfy {
     this.repository.playlists.push(playlist);
   }
 
+  populateAlbumsForArtist(artistName){
+    const spoty = new spotify.Spotify();
+
+    return spoty.getAlbumsForArtistName(artistName)
+      .then( albums => {
+        albums.map( album => this.addAlbum(artistName, 
+          { 
+            name: album.name, 
+            year: album.release_date 
+          }));
+      });
+  }
   
   save(filename = 'unqfy.json') {
     new picklejs.FileSerializer().serialize(filename, this);

@@ -21,6 +21,12 @@ class Repository{
       return this.getAlbums().reduce((accumulator, album) => accumulator.concat(album.tracks), []);
     }
 
+    getAlbumsForArtist(artistName){
+      return this.artists
+        .filter(artist => artist.name == artistName)
+        .reduce((accumulator, artist) => accumulator.concat(artist.albums) , []);
+    }
+
 }
 class Artist {
   constructor(name, country){
