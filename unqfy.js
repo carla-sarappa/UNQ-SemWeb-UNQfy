@@ -33,7 +33,9 @@ class UNQfy {
     // las propiedades name (string) y country (string)
     if (params.name === "") throw "El nombre del artista no debe ser vacio";
 
-    this.repository.addArtist(new model.Artist(params.name, params.country));
+    const artist = new model.Artist(params.name, params.country);
+    this.repository.addArtist(artist);
+    return artist;
   }
 
 
@@ -70,6 +72,10 @@ class UNQfy {
     const artist = this.repository.artists.find(artist => name == artist.name);
     if(!artist) throw "No se encontro el artista " + name;
     return artist;
+  }
+
+  getAlbums(){
+    return this.repository.getAlbums();
   }
 
   getAlbumByName(name) {

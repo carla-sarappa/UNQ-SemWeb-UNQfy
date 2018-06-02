@@ -1,31 +1,31 @@
 
 class Repository{
-    constructor(){
-        this.artists = [];
-        this.playlists = [];
-    }
-    addArtist(artist){
-      this.artists.push(artist);
-    }
+  constructor(){
+    this.artists = [];
+    this.playlists = [];
+  }
+  addArtist(artist){
+    this.artists.push(artist);
+  }
 
-    filterTracksBy(attr, values){
-      let tracks = this.getTracks().filter(track => values.includes(track[attr]) );
-      return tracks;
-    }
+  filterTracksBy(attr, values){
+    let tracks = this.getTracks().filter(track => values.includes(track[attr]) );
+    return tracks;
+  }
 
-    getAlbums(){
-      return this.artists.reduce((accumulator, artist) => accumulator.concat(artist.albums) , []);
-    }
+  getAlbums(){
+    return this.artists.reduce((accumulator, artist) => accumulator.concat(artist.albums) , []);
+  }
 
-    getTracks(){
-      return this.getAlbums().reduce((accumulator, album) => accumulator.concat(album.tracks), []);
-    }
+  getTracks(){
+    return this.getAlbums().reduce((accumulator, album) => accumulator.concat(album.tracks), []);
+  }
 
-    getAlbumsForArtist(artistName){
-      return this.artists
-        .filter(artist => artist.name == artistName)
-        .reduce((accumulator, artist) => accumulator.concat(artist.albums) , []);
-    }
+  getAlbumsForArtist(artistName){
+    return this.artists
+      .filter(artist => artist.name == artistName)
+      .reduce((accumulator, artist) => accumulator.concat(artist.albums) , []);
+  }
 
 }
 class Artist {
@@ -48,11 +48,11 @@ class Album {
 
 
 class Track {
-    constructor(name, duration, genre){
-        this.genre = genre;
-        this.name = name;
-        this.duration = duration;
-      }
+  constructor(name, duration, genre){
+    this.genre = genre;
+    this.name = name;
+    this.duration = duration;
+  }
 }
 
 class Playlist {
