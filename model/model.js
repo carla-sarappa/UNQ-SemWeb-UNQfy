@@ -5,6 +5,7 @@ class Repository{
     this.playlists = [];
     this.nextId = 0;
   }
+  
   addArtist(artist){
     this.assignId(artist);
     this.artists.push(artist);

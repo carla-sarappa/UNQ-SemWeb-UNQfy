@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 
 const router = express.Router();
 const port = process.env.PORT || 5000; // set our port
-const unqfy = unqmod.getUNQfy();
+const model = { };
 
 // JSON Parser (string body -> object)
 app.use(bodyParser.json());
@@ -23,9 +23,12 @@ router.use((req, res, next) => {
   
   console.log('REQUEST: ', req.body);
 
+  // Load unqfy before processing the request.
+  model.unqfy = unqmod.getUNQfy();
+
   // Save unqfy once we finish generating a response.
   res.on('finish', () => {
-    unqfy.save('estado');
+    model.unqfy.save('estado');
   });
 
   // Execute next middleware in the chain.
@@ -50,8 +53,8 @@ router.param('id', (req, res, next, id) => {
 });
 
 // Register our custom endoints.
-artists.register(router, unqfy);
-albums.register(router, unqfy);
+artists.register(router, model);
+albums.register(router, model);
 
 // Start server.
 app.listen(port);
