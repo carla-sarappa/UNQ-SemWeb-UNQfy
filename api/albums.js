@@ -1,29 +1,24 @@
-const unqmod = require('../unqfy');
+const albumsEndpoints = (router, unqfy) => {
+
+  router.get('/albums', (req, res) => {
+    const albums = req.query.name ?
+      unqfy.getAlbumByName(req.query.name) : unqfy.getAlbums();
+
+    res.json(albums);
+  });
+    
+  router.post('/albums', (req, res) => {
+    const album = unqfy.addAlbum(req.body);
+    res.json({ success: true, album: album});
+  });
+
+  router.delete('/albums/:id', (req, res) => {
+    unqfy.removeAlbum(req.model.id);
+    res.json({ success: true});
+  });
+
+};
 
 module.exports = {
-  register: router => {
-    router.get('/albums', (req, res) => {
-      let albums = [];
-      try {
-        if (req.query.name){
-          albums = unqmod.getUNQfy().getAlbumByName(req.query.name);
-        } else {
-          albums = unqmod.getUNQfy().getAlbums();
-        }
-        res.json(albums);
-      } catch (error) {
-        res.json({ error: error});
-      }
-     
-    });
-      
-    router.post('/albums', (req, res) => {
-      
-      res.json({ message: 'hooray! welcome to our api!' });
-    });
-      
-    router.delete('/albums', (req, res) => {
-      res.json({ message: 'hooray! welcome to our api!' });
-    });
-  }
+  register: albumsEndpoints
 };
