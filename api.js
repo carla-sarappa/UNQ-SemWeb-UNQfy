@@ -10,20 +10,28 @@ const port = process.env.PORT || 5000; // set our port
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-router.use(function(req, res, next) {
+router.use((req, res, next) => {
   // do logging
-  console.log(req.body);
+  console.log('REQUEST: ', req.body);
   next();
-  });
+});
 
 router.get('/', (req, res) => {
   res.json({ message: 'hooray! welcome to our api!' });
 });
+
 app.use('/api', router);
 
+// Error handler
+app.use((err, req, res) => {
+  console.log('ERROR: ', err);
+  res.json({error : err});
+});
+
+// Parse ID path arguments
 router.param('id', (req, res, next, id) => {
   req.model = {
-    id: id,
+    id: parseInt(id),
   };
   next();
 });

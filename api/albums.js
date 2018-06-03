@@ -1,15 +1,4 @@
-const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const unqmod = require('../unqfy');
-
-function getUNQfy(filename) {
-  let unqfy = new unqmod.UNQfy();
-  
-  if (fs.existsSync(filename)) {
-    unqfy = unqmod.UNQfy.load(filename);
-  }
-  return unqfy;
-}
-
 
 module.exports = {
   register: router => {
@@ -17,9 +6,9 @@ module.exports = {
       let albums = [];
       try {
         if (req.query.name){
-          albums = getUNQfy("estado").getAlbumByName(req.query.name);
+          albums = unqmod.getUNQfy().getAlbumByName(req.query.name);
         } else {
-          albums = getUNQfy("estado").getAlbums();
+          albums = unqmod.getUNQfy().getAlbums();
         }
         res.json(albums);
       } catch (error) {

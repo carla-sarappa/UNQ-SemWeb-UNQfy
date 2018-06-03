@@ -1,7 +1,7 @@
 
 const picklejs = require('picklejs');
 const Promise = require('bluebird');
-
+const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const model = require('./model/model');
 const spotify = require('./spotify');
 const musixmatch = require('./musixmatch');
@@ -68,15 +68,32 @@ class UNQfy {
     album.tracks.push(new model.Track(params.name, params.duration, params.genre));
   }
 
+  getArtists(){
+    return this.repository.getArtists();
+  }
+
   getArtistByName(name) {
     const artist = this.repository.artists.find(artist => name == artist.name);
     if(!artist) throw "No se encontro el artista " + name;
     return artist;
   }
 
+  getArtistById(id){
+    return this.repository.findArtistById(id)[0];
+  }
+
+  removeArtist(id){
+    const artist = this.repository.findArtistById(id);
+    if (!artist || artist.length === 0) {
+      throw { message: 'Artist does not exist' };
+    }
+    this.repository.removeArtist(id);
+  }
+
   getAlbums(){
     return this.repository.getAlbums();
   }
+
 
   getAlbumByName(name) {
     const album = this.repository.getAlbums().find(album => name === album.name);
@@ -136,6 +153,8 @@ class UNQfy {
     
     return Promise.resolve(track.lyrics);
   }
+
+  
   
   save(filename = 'unqfy.json') {
     new picklejs.FileSerializer().serialize(filename, this);
@@ -151,7 +170,20 @@ class UNQfy {
   }
 }
 
+function getUNQfy() {
+
+  const filename = 'estado';
+  let unqfy = new UNQfy();
+  
+  if (fs.existsSync(filename)) {
+    unqfy = UNQfy.load(filename);
+  }
+  return unqfy;
+}
+
 // TODO: exportar todas las clases que necesiten ser utilizadas desde un modulo cliente
 module.exports = {
   UNQfy,
+  getUNQfy
 };
+

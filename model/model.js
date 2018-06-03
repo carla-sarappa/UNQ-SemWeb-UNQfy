@@ -3,9 +3,16 @@ class Repository{
   constructor(){
     this.artists = [];
     this.playlists = [];
+    this.nextId = 0;
   }
   addArtist(artist){
+    this.assignId(artist);
     this.artists.push(artist);
+  }
+
+  assignId(entity){
+    entity.id = this.nextId;
+    this.nextId++;
   }
 
   filterTracksBy(attr, values){
@@ -21,12 +28,24 @@ class Repository{
     return this.getAlbums().reduce((accumulator, album) => accumulator.concat(album.tracks), []);
   }
 
+  getArtists(){
+    return this.artists;
+  }
+
   getAlbumsForArtist(artistName){
     return this.artists
       .filter(artist => artist.name == artistName)
       .reduce((accumulator, artist) => accumulator.concat(artist.albums) , []);
   }
 
+  findArtistById(id){
+    return this.artists.filter(artist => artist.id === id);
+  }
+
+  removeArtist(id){
+    this.artists = this.artists.filter(artist => artist.id !== id);
+    console.log(id, this.artists);
+  }
 }
 class Artist {
   constructor(name, country){
