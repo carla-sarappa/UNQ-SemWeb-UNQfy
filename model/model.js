@@ -73,6 +73,15 @@ class Artist {
   removeAlbum(album){
     this.albums = this.albums.filter(a => a !== album);
   }
+
+  toJson() {
+    return {
+      id: this.id,
+      name: this.name,
+      country: this.country,
+      albums: this.albums.map(a=>a.toJson())
+    };
+  }
 }
 
 class Album {
@@ -81,6 +90,15 @@ class Album {
     this.name = name;
     this.year = year;
     this.tracks = [];
+  }
+
+  toJson() {
+    return {
+      id: this.id,
+      name: this.name,
+      year : this.year,
+      tracks: this.tracks
+    };
   }
 
 }

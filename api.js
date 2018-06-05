@@ -1,6 +1,7 @@
 // REST API Endpoints
 const artists = require('./api/artists');
 const albums = require('./api/albums');
+const errors = require('./api/errors');
 
 // MODEL
 const unqmod = require('./unqfy');
@@ -38,12 +39,6 @@ router.use((req, res, next) => {
 // Declare 'api' as our root url.
 app.use('/api', router);
 
-// Error handler. Return any exception as an error in json format.
-app.use((err, req, res) => {
-  console.log('ERROR: ', err);
-  res.json({error : err});
-});
-
 // Parse ID path arguments so we can match :id on our url paths.
 router.param('id', (req, res, next, id) => {
   req.model = {
@@ -55,6 +50,27 @@ router.param('id', (req, res, next, id) => {
 // Register our custom endoints.
 artists.register(router, model);
 albums.register(router, model);
+
+// Error handler. Return any exception as an error in json format.
+app.use((err, req, res, next) => {
+  if (err.status === 400 && err.type === 'entity.parse.failed') {
+    res.status(400);
+    res.json(errors.BAD_REQUEST);
+  } else if (err.errorCode || err.status) {
+    res.status(err.status);
+    res.json(err);
+  } else if (res.json) {
+    res.json({error : err});
+  } else {
+    next();
+  }
+});
+
+app.use((req, res) => {
+  res.contentType('json');
+  res.status(errors.RESOURCE_NOT_FOUND.status);
+  res.send(JSON.stringify(errors.RESOURCE_NOT_FOUND));
+});
 
 // Start server.
 app.listen(port);

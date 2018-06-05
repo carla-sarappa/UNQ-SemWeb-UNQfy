@@ -5,7 +5,7 @@ const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const model = require('./model/model');
 const spotify = require('./spotify');
 const musixmatch = require('./musixmatch');
-
+const errors = require('./api/errors');
 
 class UNQfy {
   constructor() {
@@ -31,25 +31,44 @@ class UNQfy {
   addArtist(params) {
     // El objeto artista creado debe soportar (al menos)
     // las propiedades name (string) y country (string)
-    if (params.name === "") throw "El nombre del artista no debe ser vacio";
+    if (!params.name || !params.country) throw errors.BAD_REQUEST;
+
+    this._checkPreconditionNameDoesNotExist(this.getArtists(), params.name);
 
     const artist = this.repository.createArtist(params.name, params.country);
     return artist;
   }
-
 
   /* Debe soportar al menos:
       params.name (string)
       params.year (number)
   */
   addAlbum(artistName, params) {
+    if (!params.name || !params.year) throw errors.BAD_REQUEST;
+
     // El objeto album creado debe tener (al menos) las propiedades name (string) y year
     const artist = this.getArtistByName(artistName);
-    if (! artist) throw "No existe el artista " + artistName;
 
-    const album = this.repository.createAlbum(artist, params.name, params.year);
+    return this.repository.createAlbum(artist, params.name, params.year);
   }
 
+  addAlbumToArtist(params) {
+    if (!params.name || !params.year || isNaN(params.artistId)) throw errors.BAD_REQUEST;
+    this._checkPreconditionNameDoesNotExist(this.getAlbums(), params.name);
+
+    const artist = this.repository.findArtistById(params.artistId)[0];
+
+    if (!artist) throw errors.RELATED_RESOURCE_NOT_FOUND;
+
+    return this.repository.createAlbum(artist, params.name, params.year);
+  }
+
+  _checkPreconditionNameDoesNotExist(entities, name) {
+    const alreadyExists = entities
+      .some( e => e.name.toLowerCase() === name.toLowerCase());
+
+    if (alreadyExists) throw errors.RESOURCE_ALREADY_EXISTS;
+  }
 
   /* Debe soportar (al menos):
        params.name (string)
@@ -63,8 +82,7 @@ class UNQfy {
          genres (lista de strings)
     */
     const album = this.getAlbumByName(albumName);
-    if (!album) throw "No existe el album " + albumName;
-    console.log(album);
+
     album.tracks.push(new model.Track(params.name, params.duration, params.genre));
   }
 
@@ -73,20 +91,27 @@ class UNQfy {
   }
 
   getArtistByName(name) {
-    const artist = this.repository.artists.find(artist => name == artist.name);
-    if(!artist) throw "No se encontro el artista " + name;
+    const artist = this.findArtistsByName(name)[0];
+    if(!artist) throw errors.RESOURCE_NOT_FOUND;
     return artist;
   }
 
+  findArtistsByName(name = '') {
+    return this._findByName(this.repository.getArtists(), name);
+  }
+
+  findAlbumsByName(name = ''){
+    return this._findByName(this.repository.getAlbums(), name);
+  }
+
   getArtistById(id){
-    return this.repository.findArtistById(id)[0];
+    const artist = this.repository.findArtistById(id)[0];
+    if (!artist) throw errors.RESOURCE_NOT_FOUND;
+    return artist;
   }
 
   removeArtist(id){
-    const artist = this.repository.findArtistById(id);
-    if (!artist || artist.length === 0) {
-      throw { message: 'Artist does not exist' };
-    }
+    const artist = this.getArtistById(id);
     this.repository.removeArtist(id);
   }
 
@@ -94,19 +119,22 @@ class UNQfy {
     return this.repository.getAlbums();
   }
 
+  _findByName(entities, name){
+    const lowerCaseName = name.toLowerCase();
+    return entities.filter(entity => entity.name.toLowerCase().includes(lowerCaseName));
+  }
 
   getAlbumByName(name) {
-    const album = this.repository.getAlbums().find(album => name === album.name);
-    if(!album) throw "No se encontro el album " + name;
+    const album = this.findAlbumsByName(name)[0];
+    if(!album) throw errors.RESOURCE_NOT_FOUND;
     return album;
   }
 
   getAlbumById(id){
-    const album = this.repository.findAlbumById(id);
-    if (!album || album.length === 0) {
-      throw { message: 'Album does not exist' };
-    }
-    return album[0];
+    const album = this.repository.findAlbumById(id)[0];
+    if (!album) throw errors.RESOURCE_NOT_FOUND;
+    
+    return album;
   }
 
   removeAlbum(id){
@@ -118,13 +146,13 @@ class UNQfy {
   getTrackByName(name) {
     const track = this.repository.getTracks().find(track => name === track.name);
 
-    if(!track) throw "No se encontro el track " + name;
+    if(!track) throw errors.RESOURCE_NOT_FOUND;
     return track;
   }
 
   getPlaylistByName(name) {
     const playlist = this.repository.playlists.find(playlist => name == playlist.name);
-    if(!playlist) throw "No se encontro la playlist " + name;
+    if(!playlist) throw errors.RESOURCE_NOT_FOUND;
     return playlist;
   }
 
