@@ -1,5 +1,10 @@
 const albumsEndpoints = (router, model) => {
 
+  router.get('/albums/:id', (req, res) => {
+    const album = model.unqfy.getAlbumById(req.model.id);
+    res.json(album);
+  });
+
   router.get('/albums', (req, res) => {
     const albums = req.query.name ?
       model.unqfy.getAlbumByName(req.query.name) : model.unqfy.getAlbums();

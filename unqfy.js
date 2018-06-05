@@ -33,8 +33,7 @@ class UNQfy {
     // las propiedades name (string) y country (string)
     if (params.name === "") throw "El nombre del artista no debe ser vacio";
 
-    const artist = new model.Artist(params.name, params.country);
-    this.repository.addArtist(artist);
+    const artist = this.repository.createArtist(params.name, params.country);
     return artist;
   }
 
@@ -47,7 +46,8 @@ class UNQfy {
     // El objeto album creado debe tener (al menos) las propiedades name (string) y year
     const artist = this.getArtistByName(artistName);
     if (! artist) throw "No existe el artista " + artistName;
-    artist.albums.push(new model.Album(params.name, params.year));
+
+    const album = this.repository.createAlbum(artist, params.name, params.year);
   }
 
 
@@ -99,6 +99,20 @@ class UNQfy {
     const album = this.repository.getAlbums().find(album => name === album.name);
     if(!album) throw "No se encontro el album " + name;
     return album;
+  }
+
+  getAlbumById(id){
+    const album = this.repository.findAlbumById(id);
+    if (!album || album.length === 0) {
+      throw { message: 'Album does not exist' };
+    }
+    return album[0];
+  }
+
+  removeAlbum(id){
+    const album = this.getAlbumById(id);
+    const artist = this.getArtistById(album.artistId);
+    artist.removeAlbum(album);
   }
 
   getTrackByName(name) {

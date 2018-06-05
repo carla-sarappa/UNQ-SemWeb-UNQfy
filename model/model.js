@@ -5,13 +5,22 @@ class Repository{
     this.playlists = [];
     this.nextId = 0;
   }
-  
-  addArtist(artist){
-    this.assignId(artist);
+
+  createArtist(name, country){
+    const artist = new Artist (name, country);
+    this._assignId(artist);
     this.artists.push(artist);
+    return artist;
   }
 
-  assignId(entity){
+  createAlbum(artist, name, year){
+    const album = new Album(artist.id, name, year);
+    this._assignId(album);
+    artist.albums.push(album);
+    return album;
+  }
+
+  _assignId(entity){
     entity.id = this.nextId;
     this.nextId++;
   }
@@ -47,18 +56,28 @@ class Repository{
     this.artists = this.artists.filter(artist => artist.id !== id);
     console.log(id, this.artists);
   }
+
+  findAlbumById(id){
+    return this.getAlbums().filter(album => album.id === id);
+  }
+
 }
+
 class Artist {
   constructor(name, country){
     this.name = name;
     this.country = country;
     this.albums = [];
   }
+
+  removeAlbum(album){
+    this.albums = this.albums.filter(a => a !== album);
+  }
 }
 
 class Album {
-  constructor(name, year){
-    
+  constructor(artistId, name, year){
+    this.artistId = artistId;
     this.name = name;
     this.year = year;
     this.tracks = [];
