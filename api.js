@@ -52,19 +52,19 @@ artists.register(router, model);
 albums.register(router, model);
 
 // Error handler. Return any exception as an error in json format.
-app.use((err, req, res, next) => {
-  if (err.status === 400 && err.type === 'entity.parse.failed') {
-    res.status(400);
-    res.json(errors.BAD_REQUEST);
-  } else if (err.errorCode || err.status) {
-    res.status(err.status);
-    res.json(err);
-  } else if (res.json) {
-    res.json({error : err});
-  } else {
-    next();
-  }
-});
+// app.use((err, req, res, next) => {
+//   if (err.status === 400 && err.type === 'entity.parse.failed') {
+//     res.status(400);
+//     res.json(errors.BAD_REQUEST);
+//   } else if (err.errorCode || err.status) {
+//     res.status(err.status);
+//     res.json(err);
+//   } else if (res.json) {
+//     res.json({error : err});
+//   } else {
+//     next();
+//   }
+// });
 
 app.use((req, res) => {
   res.contentType('json');

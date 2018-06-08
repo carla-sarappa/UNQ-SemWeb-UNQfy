@@ -1,4 +1,3 @@
-
 const picklejs = require('picklejs');
 const Promise = require('bluebird');
 const fs = require('fs'); // necesitado para guardar/cargar unqfy
@@ -11,7 +10,7 @@ class UNQfy {
   constructor() {
     this.repository = new model.Repository();
   }
-   
+
   getTracksMatchingGenres(genres) {
     // Debe retornar todos los tracks que contengan alguno de los generos en el parametro genres
 
@@ -20,7 +19,7 @@ class UNQfy {
 
   getTracksMatchingArtist(artistName) {
     let artist = this.getArtistByName(artistName);
-   
+
     return artist.albums.reduce((accumulator, album) => accumulator.concat(album.tracks), []);
   }
 
@@ -53,7 +52,10 @@ class UNQfy {
   }
 
   addAlbumToArtist(params) {
+    console.log('addAlbumToArtist: ', params);
+
     if (!params.name || !params.year || isNaN(params.artistId)) throw errors.BAD_REQUEST;
+
     this._checkPreconditionNameDoesNotExist(this.getAlbums(), params.name);
 
     const artist = this.repository.findArtistById(params.artistId)[0];
@@ -64,8 +66,9 @@ class UNQfy {
   }
 
   _checkPreconditionNameDoesNotExist(entities, name) {
+    console.log(entities);
     const alreadyExists = entities
-      .some( e => e.name.toLowerCase() === name.toLowerCase());
+      .some(e => e.name.toLowerCase() === name.toLowerCase());
 
     if (alreadyExists) throw errors.RESOURCE_ALREADY_EXISTS;
   }
@@ -86,13 +89,13 @@ class UNQfy {
     album.tracks.push(new model.Track(params.name, params.duration, params.genre));
   }
 
-  getArtists(){
+  getArtists() {
     return this.repository.getArtists();
   }
 
   getArtistByName(name) {
     const artist = this.findArtistsByName(name)[0];
-    if(!artist) throw errors.RESOURCE_NOT_FOUND;
+    if (!artist) throw errors.RESOURCE_NOT_FOUND;
     return artist;
   }
 
@@ -100,44 +103,44 @@ class UNQfy {
     return this._findByName(this.repository.getArtists(), name);
   }
 
-  findAlbumsByName(name = ''){
+  findAlbumsByName(name = '') {
     return this._findByName(this.repository.getAlbums(), name);
   }
 
-  getArtistById(id){
+  getArtistById(id) {
     const artist = this.repository.findArtistById(id)[0];
     if (!artist) throw errors.RESOURCE_NOT_FOUND;
     return artist;
   }
 
-  removeArtist(id){
+  removeArtist(id) {
     const artist = this.getArtistById(id);
     this.repository.removeArtist(id);
   }
 
-  getAlbums(){
+  getAlbums() {
     return this.repository.getAlbums();
   }
 
-  _findByName(entities, name){
+  _findByName(entities, name) {
     const lowerCaseName = name.toLowerCase();
     return entities.filter(entity => entity.name.toLowerCase().includes(lowerCaseName));
   }
 
   getAlbumByName(name) {
     const album = this.findAlbumsByName(name)[0];
-    if(!album) throw errors.RESOURCE_NOT_FOUND;
+    if (!album) throw errors.RESOURCE_NOT_FOUND;
     return album;
   }
 
-  getAlbumById(id){
+  getAlbumById(id) {
     const album = this.repository.findAlbumById(id)[0];
     if (!album) throw errors.RESOURCE_NOT_FOUND;
-    
+
     return album;
   }
 
-  removeAlbum(id){
+  removeAlbum(id) {
     const album = this.getAlbumById(id);
     const artist = this.getArtistById(album.artistId);
     artist.removeAlbum(album);
@@ -146,13 +149,13 @@ class UNQfy {
   getTrackByName(name) {
     const track = this.repository.getTracks().find(track => name === track.name);
 
-    if(!track) throw errors.RESOURCE_NOT_FOUND;
+    if (!track) throw errors.RESOURCE_NOT_FOUND;
     return track;
   }
 
   getPlaylistByName(name) {
     const playlist = this.repository.playlists.find(playlist => name == playlist.name);
-    if(!playlist) throw errors.RESOURCE_NOT_FOUND;
+    if (!playlist) throw errors.RESOURCE_NOT_FOUND;
     return playlist;
   }
 
@@ -168,36 +171,38 @@ class UNQfy {
     this.repository.playlists.push(playlist);
   }
 
-  populateAlbumsForArtist(artistName){
+  populateAlbumsForArtist(artistName) {
     const spoty = new spotify.Spotify();
+    const artist = this.getArtistByName(artistName);
 
     return spoty.getAlbumsForArtistName(artistName)
-      .then( albums => {
-        albums.map( album => this.addAlbum(artistName, 
-          { 
-            name: album.name, 
-            year: album.release_date 
-          }));
-      });
+      .then(albums =>
+        albums.map(album => {
+          return {
+            name: album.name,
+            year: album.release_date,
+            artistId: artist.id
+          };
+        })
+      ).then(albums => albums.map(a => this.addAlbumToArtist(a)));
   }
 
-  getLyricsForTrack(trackName){
+  getLyricsForTrack(trackName) {
     const track = this.getTrackByName(trackName);
     const musix = new musixmatch.Musixmatch();
 
-    if (!track.lyrics){
+    if (!track.lyrics) {
       return musix.getLyricsFromTrackName(trackName)
         .then(lyrics => {
           track.lyrics = lyrics;
           return lyrics;
         });
     }
-    
+
     return Promise.resolve(track.lyrics);
   }
 
-  
-  
+
   save(filename = 'unqfy.json') {
     new picklejs.FileSerializer().serialize(filename, this);
   }
@@ -207,7 +212,7 @@ class UNQfy {
     // TODO: Agregar a la lista todas las clases que necesitan ser instanciadas
     const classes = [UNQfy, model.Album, model.Track, model.Artist, model.Repository, model.Playlist];
     fs.registerClasses(...classes);
-    
+
     return fs.load(filename);
   }
 }
@@ -216,15 +221,13 @@ function getUNQfy() {
 
   const filename = 'estado';
   let unqfy = new UNQfy();
-  
+
   if (fs.existsSync(filename)) {
     unqfy = UNQfy.load(filename);
   }
   return unqfy;
 }
 
-
-// TODO: exportar todas las clases que necesiten ser utilizadas desde un modulo cliente
 module.exports = {
   UNQfy,
   getUNQfy

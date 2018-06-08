@@ -26,8 +26,7 @@ class Repository{
   }
 
   filterTracksBy(attr, values){
-    let tracks = this.getTracks().filter(track => values.includes(track[attr]) );
-    return tracks;
+    return this.getTracks().filter(track => values.includes(track[attr]) );
   }
 
   getAlbums(){
@@ -40,12 +39,6 @@ class Repository{
 
   getArtists(){
     return this.artists;
-  }
-
-  getAlbumsForArtist(artistName){
-    return this.artists
-      .filter(artist => artist.name == artistName)
-      .reduce((accumulator, artist) => accumulator.concat(artist.albums) , []);
   }
 
   findArtistById(id){
