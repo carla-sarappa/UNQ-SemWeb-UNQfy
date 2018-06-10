@@ -4,7 +4,7 @@ const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const model = require('./model/model');
 const spotify = require('./spotify');
 const musixmatch = require('./musixmatch');
-const errors = require('./api/errors');
+const validations = require('./model/business_errors');
 
 class UNQfy {
   constructor() {
@@ -18,9 +18,9 @@ class UNQfy {
   }
 
   getTracksMatchingArtist(artistName) {
-    let artist = this.getArtistByName(artistName);
-
-    return artist.albums.reduce((accumulator, album) => accumulator.concat(album.tracks), []);
+    return this.getArtistByName(artistName)
+      .albums
+      .reduce((accumulator, album) => accumulator.concat(album.tracks), []);
   }
 
   /* Debe soportar al menos:
@@ -30,12 +30,10 @@ class UNQfy {
   addArtist(params) {
     // El objeto artista creado debe soportar (al menos)
     // las propiedades name (string) y country (string)
-    if (!params.name || !params.country) throw errors.BAD_REQUEST;
+    validations.InvalidArgumentException.unlessHasFields(params, ['name', 'country']);
+    validations.EntityAlreadyExistsException.ifNameAlreadyExists(this.getArtists(), params.name);
 
-    this._checkPreconditionNameDoesNotExist(this.getArtists(), params.name);
-
-    const artist = this.repository.createArtist(params.name, params.country);
-    return artist;
+    return this.repository.createArtist(params.name, params.country);
   }
 
   /* Debe soportar al menos:
@@ -43,7 +41,7 @@ class UNQfy {
       params.year (number)
   */
   addAlbum(artistName, params) {
-    if (!params.name || !params.year) throw errors.BAD_REQUEST;
+    validations.InvalidArgumentException.unlessHasFields(params, ['name', 'year']);
 
     // El objeto album creado debe tener (al menos) las propiedades name (string) y year
     const artist = this.getArtistByName(artistName);
@@ -52,25 +50,15 @@ class UNQfy {
   }
 
   addAlbumToArtist(params) {
-    console.log('addAlbumToArtist: ', params);
 
-    if (!params.name || !params.year || isNaN(params.artistId)) throw errors.BAD_REQUEST;
-
-    this._checkPreconditionNameDoesNotExist(this.getAlbums(), params.name);
+    validations.InvalidArgumentException.unlessHasFields(params, ['name', 'year', 'artistId']);
+    validations.EntityAlreadyExistsException.ifNameAlreadyExists(this.getAlbums(), params.name);
 
     const artist = this.repository.findArtistById(params.artistId)[0];
 
-    if (!artist) throw errors.RELATED_RESOURCE_NOT_FOUND;
+    if (!artist) throw new validations.RelatedEntityNotFoundException(`Unable to find artist with id=${params.artistId}`);
 
     return this.repository.createAlbum(artist, params.name, params.year);
-  }
-
-  _checkPreconditionNameDoesNotExist(entities, name) {
-    console.log(entities);
-    const alreadyExists = entities
-      .some(e => e.name.toLowerCase() === name.toLowerCase());
-
-    if (alreadyExists) throw errors.RESOURCE_ALREADY_EXISTS;
   }
 
   /* Debe soportar (al menos):
@@ -94,9 +82,7 @@ class UNQfy {
   }
 
   getArtistByName(name) {
-    const artist = this.findArtistsByName(name)[0];
-    if (!artist) throw errors.RESOURCE_NOT_FOUND;
-    return artist;
+    return validations.EntityNotFoundException.unlessResultExists(this.findArtistsByName(name));
   }
 
   findArtistsByName(name = '') {
@@ -108,13 +94,11 @@ class UNQfy {
   }
 
   getArtistById(id) {
-    const artist = this.repository.findArtistById(id)[0];
-    if (!artist) throw errors.RESOURCE_NOT_FOUND;
-    return artist;
+    return validations.EntityNotFoundException.unlessResultExists(this.repository.findArtistById(id));
   }
 
   removeArtist(id) {
-    const artist = this.getArtistById(id);
+    this.getArtistById(id); // validate that artist exists
     this.repository.removeArtist(id);
   }
 
@@ -128,16 +112,11 @@ class UNQfy {
   }
 
   getAlbumByName(name) {
-    const album = this.findAlbumsByName(name)[0];
-    if (!album) throw errors.RESOURCE_NOT_FOUND;
-    return album;
+    return validations.EntityNotFoundException.unlessResultExists(this.findAlbumsByName(name));
   }
 
   getAlbumById(id) {
-    const album = this.repository.findAlbumById(id)[0];
-    if (!album) throw errors.RESOURCE_NOT_FOUND;
-
-    return album;
+    return validations.EntityNotFoundException.unlessResultExists(this.repository.findAlbumById(id));
   }
 
   removeAlbum(id) {
@@ -148,14 +127,13 @@ class UNQfy {
 
   getTrackByName(name) {
     const track = this.repository.getTracks().find(track => name === track.name);
-
-    if (!track) throw errors.RESOURCE_NOT_FOUND;
+    if (!track) throw new validations.EntityNotFoundException(`Track ${name} not found.`);
     return track;
   }
 
   getPlaylistByName(name) {
-    const playlist = this.repository.playlists.find(playlist => name == playlist.name);
-    if (!playlist) throw errors.RESOURCE_NOT_FOUND;
+    const playlist = this.repository.playlists.find(playlist => name === playlist.name);
+    if (!playlist) throw new validations.EntityNotFoundException(`Playlist ${name} not found.`);
     return playlist;
   }
 
@@ -175,6 +153,15 @@ class UNQfy {
     const spoty = new spotify.Spotify();
     const artist = this.getArtistByName(artistName);
 
+    // for (let i=0; i < 20 ;i++) {
+    //   const a = {
+    //     name: `album${i}`,
+    //     year: `19${i}`,
+    //     artistId: artist.id
+    //   };
+    //   this.addAlbumToArtist(a);
+    // }
+    // return Promise.resolve([]);
     return spoty.getAlbumsForArtistName(artistName)
       .then(albums =>
         albums.map(album => {

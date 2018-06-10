@@ -73,7 +73,7 @@ class CommandFactory {
     this.create('add-track', 4, 'add-track <album name> <track name> <track duration> <track genre>', (args) => {
       const track = {name: args[1], duration: args[2], genre: args[3]};
       unqfy.addTrack(args[0], track);
-      return "Track added: " + track.name;
+      return 'Track added: ' + track.name;
     });
 
     this.create('get-track', 1, 'get-track <track name>', (args) => {
@@ -83,7 +83,7 @@ class CommandFactory {
     this.create('add-playlist', 3, 'add-playlist <playlist name> <playlist genre> <playlist duration>', (args) => {
       const playlist = {name: args[0], genre: args[1], duration: args[2]};
       unqfy.addPlaylist(playlist);
-      return "Playlist added: " + playlist.name;
+      return 'Playlist added: ' + playlist.name;
     });
 
     this.create('get-playlist', 1, 'get-playlist <playlist name>', (args) => {
@@ -100,10 +100,11 @@ class CommandFactory {
 
     this.create('populate-albums-for-artist', 1, 'populate-albums-for-artist <artist name>', (args) => {
       unqfy.populateAlbumsForArtist(args[0])
-        .then(lyrics => console.log(lyrics))
+        .then(albums => console.log('\n\nAlbums: ', albums))
+        .then(() => console.log('\n\nUNQFY: ', unqfy.repository.artists))
         .then(() => saveUNQfy(unqfy, 'estado'));
 
-      return '';
+      return 'promise';
     });
 
     this.create('get-lyrics-for-track', 1, 'get-lyrics-for-track <track name>', (args) => {
@@ -112,11 +113,11 @@ class CommandFactory {
         .then(() => saveUNQfy(unqfy, 'estado'));
 
       // Esto es porque necesitamos resolver la promesa antes de imprimir por pantalla  
-      return '';
+      return 'promise';
     });
 
 
-    const commandHelp = "Available commands: \n\n" + Object.values(this.commands).map((c) => '    ' + c.help + '\n').join('');
+    const commandHelp = 'Available commands: \n\n' + Object.values(this.commands).map((c) => '    ' + c.help + '\n').join('');
 
     this.create('help', 0, commandHelp, (args) => commandHelp);
 
@@ -128,7 +129,7 @@ function main() {
   const unqfy = getUNQfy('estado');
 
   // pickle.js esta loggeando el estado, esto es para separarlo del resultado del comando
-  console.log("\n========================================================================\n");
+  console.log('\n========================================================================\n');
 
 
   const args = process.argv.slice(2);
@@ -139,11 +140,11 @@ function main() {
     .loadCommands(unqfy)[action]
     .execute(commandArguments);
 
-  if (result) {
+  if (result !== 'promise') {
     console.log(result);
+    saveUNQfy(unqfy, 'estado');
   }
 
-  saveUNQfy(unqfy, 'estado');
 }
 
 main();

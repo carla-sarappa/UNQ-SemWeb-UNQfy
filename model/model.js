@@ -68,6 +68,7 @@ class Artist {
   }
 
   toJson() {
+    console.log(this.albums[0]);
     return {
       id: this.id,
       name: this.name,

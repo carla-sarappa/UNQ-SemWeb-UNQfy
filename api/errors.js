@@ -1,4 +1,4 @@
-module.exports = {
+const ERRORS = {
   RESOURCE_ALREADY_EXISTS:{
     status: 409,
     errorCode: 'RESOURCE_ALREADY_EXISTS'
@@ -19,4 +19,17 @@ module.exports = {
     status: 500,
     errorCode: 'INTERNAL_SERVER_ERROR'
   }
+};
+
+function buildJsonErrorFrom(error) {
+  if (error.errorType) {
+    return ERRORS[error.errorCode] || ERRORS.INTERNAL_SERVER_ERROR;
+  }
+
+  return ERRORS.INTERNAL_SERVER_ERROR;
+}
+
+module.exports = {
+  buildJsonErrorFrom: buildJsonErrorFrom,
+  ERRORS: ERRORS
 };

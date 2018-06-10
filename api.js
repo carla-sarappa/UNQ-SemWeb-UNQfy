@@ -55,10 +55,11 @@ albums.register(router, model);
 // app.use((err, req, res, next) => {
 //   if (err.status === 400 && err.type === 'entity.parse.failed') {
 //     res.status(400);
-//     res.json(errors.BAD_REQUEST);
-//   } else if (err.errorCode || err.status) {
-//     res.status(err.status);
-//     res.json(err);
+//     res.json(errors.ERRORS.BAD_REQUEST);
+//   } else if (err.errorType) {
+//     const jsonError = errors.buildJsonErrorFrom(err);
+//     res.status(jsonError.status);
+//     res.json(jsonError);
 //   } else if (res.json) {
 //     res.json({error : err});
 //   } else {
@@ -68,8 +69,8 @@ albums.register(router, model);
 
 app.use((req, res) => {
   res.contentType('json');
-  res.status(errors.RESOURCE_NOT_FOUND.status);
-  res.send(JSON.stringify(errors.RESOURCE_NOT_FOUND));
+  res.status(errors.ERRORS.RESOURCE_NOT_FOUND.status);
+  res.send(JSON.stringify(errors.ERRORS.RESOURCE_NOT_FOUND));
 });
 
 // Start server.
