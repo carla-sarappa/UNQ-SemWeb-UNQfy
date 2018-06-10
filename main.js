@@ -26,14 +26,14 @@ class Command {
 
   execute(args) {
     if (args.length !== this.arity && this.arity >= 0) {
-      console.log("Usage:");
-      console.log("    ", this.help);
-      console.log("\n\nUse the command 'help' for listing the available commands.");
+      console.log('Usage:');
+      console.log('    ', this.help);
+      console.log('\n\nUse the command "help" for listing the available commands.');
     } else {
       try {
         return this.block(args);
       } catch (e) {
-        return "ERROR: " + e;
+        return 'ERROR: ' + e;
       }
     }
   }
@@ -53,7 +53,7 @@ class CommandFactory {
     this.create('add-artist', 2, 'add-artist <artist name> <artist country>', (args) => {
       const artist = {name: args[0], country: args[1]};
       unqfy.addArtist(artist);
-      return "Artist added: " + artist.name;
+      return 'Artist added: ' + artist.name;
     });
 
     this.create('get-artist', 1, 'get-artist <artist name>', (args) => {
@@ -63,7 +63,7 @@ class CommandFactory {
     this.create('add-album', 3, 'add-album <artist name> <album name> <album year>', (args) => {
       const album = {name: args[1], year: args[2]};
       unqfy.addAlbum(args[0], album);
-      return "Album added: " + album.name;
+      return 'Album added: ' + album.name;
     });
 
     this.create('get-album', 1, 'get-album <album name>', (args) => {
@@ -119,7 +119,7 @@ class CommandFactory {
 
     const commandHelp = 'Available commands: \n\n' + Object.values(this.commands).map((c) => '    ' + c.help + '\n').join('');
 
-    this.create('help', 0, commandHelp, (args) => commandHelp);
+    this.create('help', 0, commandHelp, () => commandHelp);
 
     return this.commands;
   }
@@ -127,11 +127,6 @@ class CommandFactory {
 
 function main() {
   const unqfy = getUNQfy('estado');
-
-  // pickle.js esta loggeando el estado, esto es para separarlo del resultado del comando
-  console.log('\n========================================================================\n');
-
-
   const args = process.argv.slice(2);
   const action = args[0];
   const commandArguments = args.slice(1);
@@ -140,6 +135,8 @@ function main() {
     .loadCommands(unqfy)[action]
     .execute(commandArguments);
 
+  // Si el comando es asincronico, no guardar.
+  // Es responsabilidad del comando guardar luego de que termine de ejecutar.
   if (result !== 'promise') {
     console.log(result);
     saveUNQfy(unqfy, 'estado');

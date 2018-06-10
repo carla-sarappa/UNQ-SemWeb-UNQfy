@@ -1,14 +1,13 @@
 class BusinessException {
-  constructor(message, errorCode) {
+  constructor(message) {
     this.errorType = 'user error';
     this.message = message;
-    this.errorCode = errorCode;
   }
 }
 
 class EntityNotFoundException extends BusinessException {
   constructor(message) {
-    super(message, 'RESOURCE_NOT_FOUND');
+    super(message);
   }
 
   static unlessResultExists(results) {
@@ -21,13 +20,13 @@ class EntityNotFoundException extends BusinessException {
 
 class RelatedEntityNotFoundException extends BusinessException {
   constructor(message) {
-    super(message, 'RELATED_RESOURCE_NOT_FOUND');
+    super(message);
   }
 }
 
 class EntityAlreadyExistsException extends BusinessException {
   constructor(message) {
-    super(message, 'RESOURCE_ALREADY_EXISTS');
+    super(message);
   }
 
   static ifNameAlreadyExists(entities, name) {
@@ -43,7 +42,7 @@ class EntityAlreadyExistsException extends BusinessException {
 class InvalidArgumentException extends BusinessException {
 
   constructor(message) {
-    super(message, 'BAD_REQUEST');
+    super(message);
   }
 
   static unlessHasFields(argument, fieldList) {

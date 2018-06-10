@@ -19,7 +19,7 @@ const model = { };
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-// Middleware
+// Middleware for logging and saving unqfy.
 router.use((req, res, next) => {
   
   console.log('REQUEST: ', req.body);
@@ -47,25 +47,33 @@ router.param('id', (req, res, next, id) => {
   next();
 });
 
-// Register our custom endoints.
+// Register our custom endpoints.
 artists.register(router, model);
 albums.register(router, model);
 
 // Error handler. Return any exception as an error in json format.
-// app.use((err, req, res, next) => {
-//   if (err.status === 400 && err.type === 'entity.parse.failed') {
-//     res.status(400);
-//     res.json(errors.ERRORS.BAD_REQUEST);
-//   } else if (err.errorType) {
-//     const jsonError = errors.buildJsonErrorFrom(err);
-//     res.status(jsonError.status);
-//     res.json(jsonError);
-//   } else if (res.json) {
-//     res.json({error : err});
-//   } else {
-//     next();
-//   }
-// });
+app.use((err, req, res, next) => {
+
+  if (err.status === 400 && err.type === 'entity.parse.failed') {
+    // On JSON parsing error
+    res.status(400);
+    res.json(errors.ERRORS.BAD_REQUEST);
+
+  } else if (err.errorType) {
+    // On business error
+    const jsonError = errors.buildJsonErrorFrom(err);
+    res.status(jsonError.status);
+    res.json(jsonError);
+
+  } else if (res.json) {
+    // On unexpected app exception
+    res.json({error : err});
+
+  } else {
+    // On HTTP resource not found
+    next();
+  }
+});
 
 app.use((req, res) => {
   res.contentType('json');

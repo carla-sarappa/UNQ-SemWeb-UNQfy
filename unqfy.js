@@ -153,15 +153,6 @@ class UNQfy {
     const spoty = new spotify.Spotify();
     const artist = this.getArtistByName(artistName);
 
-    // for (let i=0; i < 20 ;i++) {
-    //   const a = {
-    //     name: `album${i}`,
-    //     year: `19${i}`,
-    //     artistId: artist.id
-    //   };
-    //   this.addAlbumToArtist(a);
-    // }
-    // return Promise.resolve([]);
     return spoty.getAlbumsForArtistName(artistName)
       .then(albums =>
         albums.map(album => {

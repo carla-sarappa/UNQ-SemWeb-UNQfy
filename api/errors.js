@@ -21,9 +21,17 @@ const ERRORS = {
   }
 };
 
+// Map business errors to HTTP errors.
+const ERROR_MAPPING = {
+  EntityNotFoundException: ERRORS.RESOURCE_NOT_FOUND,
+  RelatedEntityNotFoundException: ERRORS.RELATED_RESOURCE_NOT_FOUND,
+  EntityAlreadyExistsException: ERRORS.RESOURCE_ALREADY_EXISTS,
+  InvalidArgumentException: ERRORS.BAD_REQUEST
+};
+
 function buildJsonErrorFrom(error) {
   if (error.errorType) {
-    return ERRORS[error.errorCode] || ERRORS.INTERNAL_SERVER_ERROR;
+    return ERROR_MAPPING[error.constructor.name] || ERRORS.INTERNAL_SERVER_ERROR;
   }
 
   return ERRORS.INTERNAL_SERVER_ERROR;
