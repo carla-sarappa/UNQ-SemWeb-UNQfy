@@ -162,8 +162,15 @@ class UNQfy {
             artistId: artist.id
           };
         })
-      ).then(albums => albums.map(a => this.addAlbumToArtist(a)));
+      ).then(albums => albums.map((a)=>{
+        try {
+          return this.addAlbumToArtist(a);
+        } catch (e) {
+          console.log('Warning: ' + e.message);
+        }
+      }));
   }
+        
 
   getLyricsForTrack(trackName) {
     const track = this.getTrackByName(trackName);

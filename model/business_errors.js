@@ -34,7 +34,7 @@ class EntityAlreadyExistsException extends BusinessException {
       .find(e => e.name.toLowerCase() === name.toLowerCase());
 
     if (entityName) throw new EntityAlreadyExistsException(
-      `${entityName} already exists.`
+      `${name} already exists.`
     );
   }
 }

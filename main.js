@@ -33,7 +33,7 @@ class Command {
       try {
         return this.block(args);
       } catch (e) {
-        return 'ERROR: ' + e;
+        return 'ERROR: ' + (e.message || e);
       }
     }
   }
