@@ -12,13 +12,15 @@ class SubscriptionRepository{
   }
 
   add(artistId, email){
-    console.log(artistId, email);
     if (!this.subscriptions[artistId]){
       this.subscriptions[artistId] = [];
     }
 
+    if (this.subscriptions[artistId].some(e=> e===email)){
+      return;
+    }
+
     this.subscriptions[artistId].push(email);
-    console.log(this.subscriptions);
   }
 
   remove(artistId, email){
