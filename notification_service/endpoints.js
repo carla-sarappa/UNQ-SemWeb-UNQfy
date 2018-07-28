@@ -8,8 +8,8 @@ const notificationEndpoints = (router, model) => {
   });
 
   router.post('/unsubscribe', (req, res) => {
-    model.notifications.unsubscribe(req.body.artistName, req.body.email);
-    res.json({});
+    return model.notifications.unsubscribe(req.body.artistName, req.body.email)
+      .then(()=>res.json({}));
   });
 
   // router.post('/notify', (req, res) => {
@@ -23,7 +23,8 @@ const notificationEndpoints = (router, model) => {
   });
 
   router.delete('/subscriptions', (req, res) => {
-    return model.notifications.unsubscribeAll(req.body.artistName);
+    return model.notifications.unsubscribeAll(req.body.artistName)
+      .then(()=>res.json({}));
   });
 
 };
