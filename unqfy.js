@@ -1,16 +1,26 @@
-const picklejs = require('picklejs');
+const { picklify, unpicklify } = require('picklify');
 const Promise = require('bluebird');
 const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const model = require('./model/model');
 const spotify = require('./spotify');
 const musixmatch = require('./musixmatch');
 const validations = require('./model/business_errors');
+const notifier = require('./notifier');
 
 class UNQfy {
   constructor() {
     this.repository = new model.Repository();
+
   }
 
+  setUpListeners(){
+    this.repository.setOnNewAlbumListener((artist, album)=>{
+      new notifier.Notifier().notifyNewAlbum(artist, album);
+    });
+    this.repository.setOnArtistRemovedListener((artistId)=>{
+      new notifier.Notifier().notifyArtistRemoved(artistId);
+    });
+  }
   getTracksMatchingGenres(genres) {
     // Debe retornar todos los tracks que contengan alguno de los generos en el parametro genres
 
@@ -189,16 +199,15 @@ class UNQfy {
 
 
   save(filename = 'unqfy.json') {
-    new picklejs.FileSerializer().serialize(filename, this);
+    const serialized = picklify(this);
+    fs.writeFileSync(filename, JSON.stringify(serialized));
   }
 
   static load(filename = 'unqfy.json') {
-    const fs = new picklejs.FileSerializer();
     // TODO: Agregar a la lista todas las clases que necesitan ser instanciadas
     const classes = [UNQfy, model.Album, model.Track, model.Artist, model.Repository, model.Playlist];
-    fs.registerClasses(...classes);
-
-    return fs.load(filename);
+    const serialized = fs.readFileSync(filename);
+    return unpicklify(JSON.parse(serialized), classes);
   }
 }
 
@@ -209,7 +218,9 @@ function getUNQfy() {
 
   if (fs.existsSync(filename)) {
     unqfy = UNQfy.load(filename);
+
   }
+  unqfy.setUpListeners();
   return unqfy;
 }
 
