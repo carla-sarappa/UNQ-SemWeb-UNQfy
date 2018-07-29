@@ -4,6 +4,16 @@ class Repository{
     this.artists = [];
     this.playlists = [];
     this.nextId = 0;
+    this.onNewAlbum = ()=>{};
+    this.onArtistRemoved = ()=>{};
+  }
+
+  setOnNewAlbumListener(listener){
+    this.onNewAlbum = listener;
+  }
+
+  setOnArtistRemovedListener(listener){
+    this.onArtistRemoved = listener;
   }
 
   createArtist(name, country){
@@ -17,6 +27,7 @@ class Repository{
     const album = new Album(artist.id, name, year);
     this._assignId(album);
     artist.albums.push(album);
+    this.onNewAlbum(artist, album);
     return album;
   }
 
@@ -48,6 +59,7 @@ class Repository{
   removeArtist(id){
     this.artists = this.artists.filter(artist => artist.id !== id);
     console.log(id, this.artists);
+    this.onArtistRemoved(id);
   }
 
   findAlbumById(id){

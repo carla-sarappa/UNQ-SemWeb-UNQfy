@@ -15,6 +15,14 @@ class UnqfyClient {
     return rp.get(options);
   }
 
+  getArtist(artistId){
+    const options = {
+      url: 'http://localhost:5000/api/artists/' + artistId,
+      json: true
+    };
+
+    return rp.get(options);
+  }
 }
 
 module.exports = {

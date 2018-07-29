@@ -3,12 +3,12 @@
 const notificationEndpoints = (router, model) => {
 
   router.post('/subscribe', (req, res) => {
-    return model.notifications.subscribe(req.body.artistName, req.body.email)
+    return model.notifications.subscribe(req.body.artistId, req.body.email)
       .then(()=>res.json({}));
   });
 
   router.post('/unsubscribe', (req, res) => {
-    return model.notifications.unsubscribe(req.body.artistName, req.body.email)
+    return model.notifications.unsubscribe(req.body.artistId, req.body.email)
       .then(()=>res.json({}));
   });
 
@@ -18,13 +18,13 @@ const notificationEndpoints = (router, model) => {
   });
 
   router.get('/subscriptions', (req, res) => {
-    return model.notifications.getSubscriptions(req.query.artistName)
+    return model.notifications.getSubscriptions(req.query.artistId)
       .then(a=>res.json(a));
   });
 
   router.delete('/subscriptions', (req, res) => {
-    return model.notifications.unsubscribeAll(req.body.artistName)
-      .then(()=>res.json({}));
+    model.notifications.unsubscribeAll(req.body.artistId);
+    res.json({});
   });
 
 };

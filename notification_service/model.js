@@ -9,7 +9,7 @@ class SubscriptionRepository{
 
 
   getAll(artistId){
-    return this.subscriptions[artistId];
+    return this.subscriptions[artistId] || [];
   }
 
   add(artistId, email){
@@ -42,13 +42,18 @@ class NotificationService {
     this.mailer = new mailer_client.MailerClient();
   }
 
-  _findArtistId(artistName){
-    return this.unqfy.searchArtist(artistName)
-      .then(e=> e[0].id);
+  _findArtistId(artistId){
+    console.log("mi artist id: ", artistId);
+    return this.unqfy.getArtist(artistId)
+      .then(e=>{
+        console.log(e);
+        return e;
+      })
+      .then(e=> e.id);
   }
 
-  getSubscriptions(artistName){
-    return this._findArtistId(artistName)
+  getSubscriptions(artistId){
+    return this._findArtistId(artistId)
       .then(id=> {
         return {
           artistId: id,
@@ -57,17 +62,17 @@ class NotificationService {
       });
   }
 
-  subscribe(artistName, email){
-    return this._findArtistId(artistName)
+  subscribe(artistId, email){
+    return this._findArtistId(artistId)
       .then(id=>this.subscriptions.add(id, email));
   }
 
-  unsubscribe(artistName, email){
-    return this._findArtistId(artistName).then(id=>this.subscriptions.remove(id, email));
+  unsubscribe(artistId, email){
+    return this._findArtistId(artistId).then(id=>this.subscriptions.remove(id, email));
   }
 
-  unsubscribeAll(artistName){
-    return this._findArtistId(artistName).then(id=>this.subscriptions.clearAll(id));
+  unsubscribeAll(artistId){
+    this.subscriptions.clearAll(artistId);
   }
 
   notify(artistId, subject, message, from){
