@@ -12,10 +12,10 @@ const notificationEndpoints = (router, model) => {
       .then(()=>res.json({}));
   });
 
-  // router.post('/notify', (req, res) => {
-  //   const album = model.unqfy.addAlbumToArtist(req.body);
-  //   res.json(album.toJson());
-  // });
+  router.post('/notify', (req, res) => {
+    return model.notifications.notify(req.body.artistId, req.body.subject, req.body.message, req.body.from)
+      .then(()=>res.json({}));
+  });
 
   router.get('/subscriptions', (req, res) => {
     return model.notifications.getSubscriptions(req.query.artistName)

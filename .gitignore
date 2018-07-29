@@ -67,3 +67,4 @@ spotifyCreds.json
 generateSpotifyCredentials.js
 musixmatchCreds.json
 .idea/
+/notification_service/emailCredentials.json
