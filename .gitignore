@@ -63,8 +63,8 @@ typings/
 estado
 test.json
 .vscode
-spotifyCreds.json
+unqfy_service/vendors/spotifyCreds.json
 generateSpotifyCredentials.js
-musixmatchCreds.json
+unqfy_service/vendors/musixmatchCreds.json
 .idea/
 /notification_service/emailCredentials.json

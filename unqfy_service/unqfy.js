@@ -2,10 +2,10 @@ const { picklify, unpicklify } = require('picklify');
 const Promise = require('bluebird');
 const fs = require('fs'); // necesitado para guardar/cargar unqfy
 const model = require('./model/model');
-const spotify = require('./spotify');
-const musixmatch = require('./musixmatch');
+const spotify = require('./vendors/spotify');
+const musixmatch = require('./vendors/musixmatch');
 const validations = require('./model/business_errors');
-const notifier = require('./notifier');
+const notifier = require('./vendors/notifier');
 
 class UNQfy {
   constructor() {

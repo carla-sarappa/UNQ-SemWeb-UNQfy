@@ -1,5 +1,5 @@
 const fs = require('fs'); // necesitado para guardar/cargar unqfy
-const unqmod = require('./unqfy');
+const unqmod = require('./unqfy_service/unqfy');
 
 // Retorna una instancia de UNQfy. Si existe filename, recupera la instancia desde el archivo.
 function getUNQfy(filename) {
