@@ -2,7 +2,7 @@
 const artists = require('./api/artists');
 const albums = require('./api/albums');
 const errors = require('./api/errors');
-const config = require ('../config');
+const config = require ('./config');
 
 // MODEL
 const unqmod = require('./unqfy');

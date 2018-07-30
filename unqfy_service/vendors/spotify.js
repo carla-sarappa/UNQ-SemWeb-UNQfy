@@ -1,5 +1,5 @@
 const fs = require('fs');
-const credentials = JSON.parse(fs.readFileSync('./unqfy_service/vendors/spotifyCreds.json', 'utf8'));
+const credentials = JSON.parse(fs.readFileSync('./vendors/spotifyCreds.json', 'utf8'));
 const credential_header = { Authorization: 'Bearer ' + credentials.access_token };
 
 const rp = require('request-promise');

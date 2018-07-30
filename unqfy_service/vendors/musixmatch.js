@@ -1,5 +1,5 @@
 const fs = require('fs');
-const credentials = JSON.parse(fs.readFileSync('./unqfy_service/vendors/musixmatchCreds.json', 'utf8'));
+const credentials = JSON.parse(fs.readFileSync('./vendors/musixmatchCreds.json', 'utf8'));
 const rp = require('request-promise');
 
 class Musixmatch {

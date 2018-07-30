@@ -1,7 +1,7 @@
 const errors = require('./errors');
 const endpoints = require('./endpoints');
 const notificationService = require('./model');
-const config = require ('../config');
+const config = require ('./config');
 
 
 

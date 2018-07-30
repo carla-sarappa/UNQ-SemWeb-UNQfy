@@ -64,7 +64,7 @@ estado
 test.json
 .vscode
 unqfy_service/vendors/spotifyCreds.json
-generateSpotifyCredentials.js
+unqfy_service/generateSpotifyCredentials.js
 unqfy_service/vendors/musixmatchCreds.json
 .idea/
 /notification_service/emailCredentials.json
