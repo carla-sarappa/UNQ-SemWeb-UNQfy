@@ -1,10 +1,11 @@
 const rp = require('request-promise');
+const config = require ('../config');
 
 class UnqfyClient {
 
   searchArtist(artistName){
     const options = {
-      url: 'http://localhost:5000/api/artists',
+      url: `${config.UNQFY_URL}/api/artists`,
 
       qs: {
         name: artistName,
@@ -17,7 +18,7 @@ class UnqfyClient {
 
   getArtist(artistId){
     const options = {
-      url: 'http://localhost:5000/api/artists/' + artistId,
+      url: `${config.UNQFY_URL}/api/artists/${artistId}`,
       json: true
     };
 

@@ -2,6 +2,7 @@
 const artists = require('./api/artists');
 const albums = require('./api/albums');
 const errors = require('./api/errors');
+const config = require ('../config');
 
 // MODEL
 const unqmod = require('./unqfy');
@@ -12,7 +13,7 @@ const app = express(); // define our app using express
 const bodyParser = require('body-parser');
 
 const router = express.Router();
-const port = process.env.PORT || 5000; // set our port
+const port = process.env.PORT || config.UNQFY_PORT; // set our port
 const model = { };
 
 // JSON Parser (string body -> object)

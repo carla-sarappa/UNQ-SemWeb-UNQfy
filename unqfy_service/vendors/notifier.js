@@ -1,11 +1,12 @@
 const rp = require('request-promise');
+const config = require ('../../config');
+
 
 class Notifier {
 
   notifyNewAlbum(artist, album){
-    console.log("Notify New Album");
     const options = {
-      url: 'http://localhost:9000/api/notify',
+      url: `${config.NOTIF_URL}/api/notify`,
       body: {
         artistId: artist.id,
         subject: `Nuevo Album para artista ${artist.name}`,
@@ -20,7 +21,7 @@ class Notifier {
 
   notifyArtistRemoved(artistId){
     const options = {
-      url: 'http://localhost:9000/api/subscriptions',
+      url: `${config.NOTIF_URL}/api/subscriptions`,
       body: {
         artistId: artistId
       },

@@ -1,6 +1,8 @@
 const errors = require('./errors');
 const endpoints = require('./endpoints');
 const notificationService = require('./model');
+const config = require ('../config');
+
 
 
 // EXPRESS
@@ -9,7 +11,7 @@ const app = express(); // define our app using express
 const bodyParser = require('body-parser');
 
 const router = express.Router();
-const port = process.env.PORT || 9000; // set our port
+const port = process.env.PORT || config.NOTIF_PORT; // set our port
 const model = {
   notifications: new notificationService.NotificationService()
 };
