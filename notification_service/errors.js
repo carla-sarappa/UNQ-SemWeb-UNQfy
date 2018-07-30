@@ -26,7 +26,6 @@ const ERRORS = {
 const ERROR_MAPPING = {
   EntityNotFoundException: ERRORS.RESOURCE_NOT_FOUND,
   RelatedEntityNotFoundException: ERRORS.RELATED_RESOURCE_NOT_FOUND,
-  EntityAlreadyExistsException: ERRORS.RESOURCE_ALREADY_EXISTS,
   InvalidArgumentException: ERRORS.BAD_REQUEST
 };
 

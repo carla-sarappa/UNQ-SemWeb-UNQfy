@@ -1,5 +1,6 @@
 const unqfy_client = require('./unqfy_client');
 const mailer_client = require('./mailer_client');
+const validations = require('./business_errors');
 
 
 class SubscriptionRepository{
@@ -43,12 +44,9 @@ class NotificationService {
   }
 
   _findArtistId(artistId){
-    console.log("mi artist id: ", artistId);
     return this.unqfy.getArtist(artistId)
-      .then(e=>{
-        console.log(e);
-        return e;
-      })
+      .catch(e=> null)
+      .then(validations.RelatedEntityNotFoundException.unlessExists)
       .then(e=> e.id);
   }
 
@@ -62,13 +60,18 @@ class NotificationService {
       });
   }
 
-  subscribe(artistId, email){
-    return this._findArtistId(artistId)
-      .then(id=>this.subscriptions.add(id, email));
+  subscribe(subscription){
+    validations.InvalidArgumentException.unlessHasFields(subscription, ['artistId', 'email']);
+
+    return this._findArtistId(subscription.artistId)
+      .then(id=>this.subscriptions.add(id, subscription.email));
   }
 
-  unsubscribe(artistId, email){
-    return this._findArtistId(artistId).then(id=>this.subscriptions.remove(id, email));
+  unsubscribe(subscription){
+    validations.InvalidArgumentException.unlessHasFields(subscription, ['artistId', 'email']);
+
+    return this._findArtistId(subscription.artistId)
+      .then(id=>this.subscriptions.remove(id, subscription.email));
   }
 
   unsubscribeAll(artistId){
@@ -76,7 +79,7 @@ class NotificationService {
   }
 
   notify(artistId, subject, message, from){
-    console.log("esto: ", this.subscriptions.getAll(artistId));
+    console.log('Sending notification: ', this.subscriptions.getAll(artistId));
     const mailOptions = {
       from: from,
       to: this.subscriptions.getAll(artistId).join(', '),
