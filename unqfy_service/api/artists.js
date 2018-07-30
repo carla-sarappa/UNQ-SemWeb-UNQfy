@@ -11,9 +11,14 @@ const artistsEndpoints = (router, model) => {
     res.json(artists.map(a=>a.toJson()));
   });
 
+  router.get('/videos', (req, res) => {
+    return model.unqfy.findVideosForArtist(req.query.name)
+      .then(videos=>res.json(videos))
+      .catch(e=>console.log("error: ", e));
+  });
+
   router.post('/artists', (req, res) => {
-    const artist = model.unqfy.addArtist(req.body);
-    res.json(artist.toJson());
+    return model.unqfy.addArtist(req.body).then(artist=>res.json(artist.toJson()));
   });
 
   router.delete('/artists/:id', (req, res) => {

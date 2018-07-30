@@ -68,3 +68,4 @@ unqfy_service/generateSpotifyCredentials.js
 unqfy_service/vendors/musixmatchCreds.json
 .idea/
 /notification_service/emailCredentials.json
+/unqfy_service/vendors/youtubeCreds.json

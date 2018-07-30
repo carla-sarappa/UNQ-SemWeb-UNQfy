@@ -6,6 +6,8 @@ const spotify = require('./vendors/spotify');
 const musixmatch = require('./vendors/musixmatch');
 const validations = require('./model/business_errors');
 const notifier = require('./vendors/notifier');
+const youtube = require('./vendors/youtube');
+
 
 class UNQfy {
   constructor() {
@@ -33,6 +35,10 @@ class UNQfy {
       .reduce((accumulator, album) => accumulator.concat(album.tracks), []);
   }
 
+  findVideosForArtist(artistName){
+    return new youtube.Youtube().searchVideos(artistName);
+  }
+
   /* Debe soportar al menos:
      params.name (string)
      params.country (string)
@@ -43,7 +49,12 @@ class UNQfy {
     validations.InvalidArgumentException.unlessHasFields(params, ['name', 'country']);
     validations.EntityAlreadyExistsException.ifNameAlreadyExists(this.getArtists(), params.name);
 
-    return this.repository.createArtist(params.name, params.country);
+    const artist = this.repository.createArtist(params.name, params.country);
+    return this.findVideosForArtist(artist.name).then(videos=>{
+      artist.videos.push(...videos);
+      console.log(videos);
+      return artist;
+    });
   }
 
   /* Debe soportar al menos:

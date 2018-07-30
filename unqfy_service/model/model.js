@@ -73,6 +73,7 @@ class Artist {
     this.name = name;
     this.country = country;
     this.albums = [];
+    this.videos = [];
   }
 
   removeAlbum(album){
@@ -80,12 +81,12 @@ class Artist {
   }
 
   toJson() {
-    console.log(this.albums[0]);
     return {
       id: this.id,
       name: this.name,
       country: this.country,
-      albums: this.albums.map(a=>a.toJson())
+      albums: this.albums.map(a=>a.toJson()),
+      videos: this.videos
     };
   }
 }
