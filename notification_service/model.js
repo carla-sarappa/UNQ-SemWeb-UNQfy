@@ -1,7 +1,7 @@
 const unqfy_client = require('./unqfy_client');
 const mailer_client = require('./mailer_client');
 const validations = require('./business_errors');
-
+const Promise = require('bluebird');
 
 class SubscriptionRepository{
   constructor(){
@@ -26,7 +26,9 @@ class SubscriptionRepository{
   }
 
   remove(artistId, email){
-    this.subscriptions[artistId] = this.subscriptions[artistId].filter(e => e !== email);
+    if (this.subscriptions[artistId]) {
+      this.subscriptions[artistId] = this.subscriptions[artistId].filter(e => e !== email);
+    }
   }
 
   clearAll(artistId){
@@ -89,7 +91,12 @@ class NotificationService {
     };
 
     return this._findArtistId(artistId)
-      .then(()=> this.mailer.sendEmail(mailOptions));
+      .then(()=> {
+        if (mailOptions.to.length !== 0) {
+          // Solamente enviar mail si hay recipients
+          this.mailer.sendEmail(mailOptions);
+        }
+      });
   }
 
 }
