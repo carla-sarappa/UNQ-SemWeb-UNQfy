@@ -4,6 +4,7 @@ function errorHandler(res, err) {
   const jsonError = errors.buildJsonErrorFrom(err);
   res.status(jsonError.status);
   res.json(jsonError);
+  console.log('Handled error: ', err);
 }
 
 const notificationEndpoints = (router, model) => {
@@ -34,8 +35,9 @@ const notificationEndpoints = (router, model) => {
   });
 
   router.delete('/subscriptions', (req, res) => {
-    model.notifications.unsubscribeAll(req.body.artistId);
-    res.json({});
+    return model.notifications.unsubscribeAll(req.body.artistId)
+      .then(a=>res.json(a))
+      .catch(err => errorHandler(res, err));
   });
 
 };

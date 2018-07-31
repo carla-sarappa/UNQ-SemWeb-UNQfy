@@ -75,18 +75,21 @@ class NotificationService {
   }
 
   unsubscribeAll(artistId){
-    this.subscriptions.clearAll(artistId);
+    return this._findArtistId(artistId)
+      .then(()=>this.subscriptions.clearAll(artistId));
   }
 
   notify(artistId, subject, message, from){
-    console.log('Sending notification: ', this.subscriptions.getAll(artistId));
+
     const mailOptions = {
       from: from,
       to: this.subscriptions.getAll(artistId).join(', '),
       subject: subject,
       text: message
     };
-    return this.mailer.sendEmail(mailOptions);
+
+    return this._findArtistId(artistId)
+      .then(()=> this.mailer.sendEmail(mailOptions));
   }
 
 }
